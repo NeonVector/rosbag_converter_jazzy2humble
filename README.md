@@ -1,8 +1,8 @@
-# Description
+## Description
 
 This program is designed to convert the *rosbag2* *jazzy* *"metadata.yaml"* style into a format that *humble* understands.
 
-# jazzy and humble rosbag2 incompatibility issue
+## jazzy and humble rosbag2 incompatibility issue
 
 Any rosbags (*sqlite3* or *mcap* - it doesn't matter) written to *ROS2**jazzy* are not readable in *ROS2**humble*. There is a backward compatibility.
 
@@ -13,11 +13,11 @@ Error itself:
 Exception on parsing info file: yaml-cpp: error at line ... bad conversion
 ```
 
-# The reason for the incompatibility of rosbags
+## The reason for the incompatibility of rosbags
 
 By the method of research and comparison, it was determined that the reason for the unreadability of *jazzy* rosbags in *humble* lies in the fact that *jazzy* and *humble* *"metadata.yaml"* have different styles.
 
-# Differences in the "metadata.yaml" style
+## Differences in the "metadata.yaml" style
 
 1) The line `offered_qos_profiles:`
 
@@ -83,7 +83,7 @@ By the method of research and comparison, it was determined that the reason for 
       message_count: 15
 ```
 
-# Purpose of the program
+## Purpose of the program
 
 The program rewrites *jazzy* *"metadata.yaml"* into *humble* *"metadata.yaml"*, it simply refactors it.
 
@@ -98,7 +98,7 @@ Program:
 
 The program does not rewrite the source *"metadata.yaml"* file, but creates a new one based on it in the same directory.
 
-# Program launch
+## Program launch
 
 The program consists of a single file that needs to be run in the *jazzy* *"metadata.yaml"* directory.
 
@@ -111,11 +111,11 @@ g++ -o rosbag2_metadata_jazzy_to_humble.out rosbag2_metadata_jazzy_to_humble.cpp
 ```bash
 ./rosbag2_metadata_jazzy_to_humble.out
 ```
-# Program Parameters
+## Program Parameters
 
 Inside the code, you can specify the name of the output yaml file, by default it is *"metadata_humble.yaml"*.
 
-# Program quality
+## Program quality
 
 The program was successfully tested on several rosbacks, and everything was displayed properly in rviz. *humble* run .db3 and .mcap rosbags of *jazzy*.
 
