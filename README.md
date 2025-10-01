@@ -130,4 +130,4 @@ this means that the dictionary inside the program is formed incorrectly. Try cha
 
 In an amicable way, it's needed to determine an unambiguous match in std::map based on some kind of ROS2 documentation, and not by experimenting. But for now, as it is.
 
-I will be glad to receive a feedback :)
+I hope this information will be useful to someone. I will be glad to receive a feedback :)
