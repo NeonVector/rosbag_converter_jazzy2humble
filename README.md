@@ -1,6 +1,6 @@
 ## Description
 
-This program is designed to convert the *rosbag2* *jazzy* *"metadata.yaml"* style into a format that *humble* understands.
+This very simple program is designed to convert the *rosbag2* *jazzy* *"metadata.yaml"* style into a format that *humble* understands.
 
 ## jazzy and humble rosbag2 incompatibility issue
 
