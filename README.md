@@ -45,7 +45,7 @@ By the method of research and comparison, it was determined that the reason for 
         offered_qos_profiles: "- history: 3\n  depth: 0\n  reliability: 1\n  durability: 2\n  deadline:\n    sec: 9223372036\n    nsec: 854775807\n  lifespan:\n    sec: 9223372036\n    nsec: 854775807\n  liveliness: 1\n  liveliness_lease_duration:\n    sec: 9223372036\n    nsec: 854775807\n  avoid_ros_namespace_conventions: false"
 ```
 
-2) The lines `custom_data:`, `ros_distro:` at the end of the *humble* file do not exist.
+2) The `custom_data:` and `ros_distro:` lines at the end of the *humble* file do not exist.
 
 - **jazzy:**
 ```yaml jazzy
@@ -90,10 +90,10 @@ The program rewrites *jazzy* *"metadata.yaml"* into *humble* *"metadata.yaml"*, 
 It is based on a dictionary, written based on [ROS2 QoS policies](https://docs.ros.org/en/humble/Concepts/Intermediate/About-Quality-of-Service-Settings.html).
 
 Program:
-- changes the `offered_qos_profiles:` string (in *humble* style)
-- deletes the `type_description_hash:` string (*humble* file doesn't have one)
-- deletes the `custom_data:` string (*humble* file doesn't have one)
-- deletes `ros_distro:` string (*humble* file doesn't have one)
+- changes the `offered_qos_profiles:` (in *humble* style)
+- deletes the `type_description_hash:` (*humble* file doesn't have one)
+- deletes the `custom_data:` (*humble* file doesn't have one)
+- deletes `ros_distro:` (*humble* file doesn't have one)
 - removes duplicate information of `offered_qos_profiles:` (*humble* file doesn't have it)
 
 The program does not rewrite the source *"metadata.yaml"* file, but creates a new one based on it in the same directory.
