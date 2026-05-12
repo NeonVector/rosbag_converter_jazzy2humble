@@ -37,7 +37,7 @@ std::map<std::string, std::string> liveliness{{"automatic", "1"}, {"manual_by_to
 
 // Yaml hardcoded parameters
 const std::string in_file_name = "metadata.yaml";
-const std::string target_line = "        offered_qos_profiles:"; //'jazzy' yaml file line that needs to be changed
+const std::string target_line = "        offered_qos_profiles:"; // 'jazzy' yaml file line that needs to be changed
 const int option_spaces_number = 12; // spaces number for 'offered_qos_profiles:' options
 const int option_sec_number = 19;
 const int option_nsec_number = 20;
@@ -54,7 +54,7 @@ void change_option(std::fstream& yaml_file_in, std::string& new_target_line);
 int main() {
 
   std::fstream yaml_file_in;  // ROS2 'jazzy' rosbag yaml file
-  std::fstream yaml_file_out;  // ROS2 'humble' rosbag yaml file
+  std::fstream yaml_file_out; // ROS2 'humble' rosbag yaml file
 
   // Open the file to perform read operation
   yaml_file_in.open(in_file_name, std::ios::in);
@@ -62,19 +62,20 @@ int main() {
   yaml_file_out.open(out_file_name, std::ios::out);
 
   // Checking whether the files are opened
-  if (! yaml_file_in.is_open() || ! yaml_file_out.is_open()) {
-    return 0;
+  if (!yaml_file_in.is_open() || !yaml_file_out.is_open()) {
+    std::cerr << "Error: could not open input or output file.\n";
+    return 1;
   }
 
   std::string in_line; // 'jazzy' yaml file current line
-    
+
   // Reading from 'jazzy' yaml file by line and writing to 'humble' yaml file
   while (std::getline(yaml_file_in, in_line)) {
 
     // Catch line that needs to be changed
     if (in_line == target_line) {
 
-      std::string new_target_line = target_line + start_options; //'humble' yaml file line
+      std::string new_target_line = target_line + start_options; // 'humble' yaml file line
 
       // 'history:' option
       change_option("history: ", history, yaml_file_in, new_target_line);
@@ -97,18 +98,54 @@ int main() {
 
       new_target_line += end_options;
 
-      // Print the data of the string
+      // Write the converted compact humble-style line
       yaml_file_out << new_target_line << "\n";
 
-      // Skip duplicate information if there is one
-      // And skip 'type_description_hash:'
-      std::getline(yaml_file_in, in_line);
-      std::string duplicate_flag = "history: ";
-      if (in_line.substr(option_spaces_number, duplicate_flag.size()) == duplicate_flag) {
-        for (int k = 0; k < 15; ++k) {
-          std::getline(yaml_file_in, in_line);
+      // --- Skip duplicate expanded QoS block and 'type_description_hash:' ---
+      std::string peek_line;
+      if (std::getline(yaml_file_in, peek_line)) {
+
+        bool is_duplicate = (peek_line.find("history: ") != std::string::npos &&
+                             peek_line.find("\"") == std::string::npos);
+
+        if (is_duplicate) {
+          // Dynamically skip all lines belonging to the expanded duplicate QoS block.
+          // Lines in this block are indented (start with spaces) and are not 'type_description_hash:'
+          while (std::getline(yaml_file_in, peek_line)) {
+
+            // Stop and discard 'type_description_hash:' line
+            if (peek_line.find("type_description_hash:") != std::string::npos) {
+              break;
+            }
+
+            // If we've exited QoS indentation (non-empty, non-space first char),
+            // this line belongs to the next section — write it and stop skipping
+            if (!peek_line.empty() && peek_line[0] != ' ') {
+              yaml_file_out << peek_line << "\n";
+              break;
+            }
+
+            // If we've reached a new top-level topic entry at 8-space indent with '- topic_metadata:',
+            // this belongs to the next topic — write it and stop skipping
+            if (peek_line.size() > 9 &&
+                peek_line.substr(0, 8) == "        " &&
+                peek_line.find("- topic_metadata:") != std::string::npos) {
+              yaml_file_out << peek_line << "\n";
+              break;
+            }
+
+            // Otherwise: still inside the duplicate QoS block — skip the line
+          }
+
+        } else {
+          // No duplicate block — just check if it's 'type_description_hash:' and skip it,
+          // otherwise write normally
+          if (peek_line.find("type_description_hash:") == std::string::npos) {
+            yaml_file_out << peek_line << "\n";
+          }
         }
       }
+      // --- End duplicate skip ---
 
     } else {
 
@@ -119,17 +156,16 @@ int main() {
       if (in_line == "  ros_distro: jazzy") {
         in_line = "  ros_distro: humble";
       }
-        
+
       // Print the data of the string
       yaml_file_out << in_line << "\n";
     }
-
   }
 
-  // Close the file object.
-  yaml_file_in.close(); 
+  // Close the file objects
+  yaml_file_in.close();
   yaml_file_out.close();
-  
+
   std::cout << "Created rosbag humble \"" << out_file_name << "\"\n";
   return 0;
 }

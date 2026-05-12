@@ -53,35 +53,8 @@ By the method of research and comparison, it was determined that the reason for 
   ros_distro: jazzy
 ```
 
-3) The line `type_description_hash:` in *humble* file do not exist.
-
-- **jazzy:**
-```yaml jazzy
-    - topic_metadata:
-        ...
-        type_description_hash: RIHS01_e369d0f05a23ae52508854b66f6aa0437f3449d652e8cbf22d5abe85d020f087
-      message_count: 12408
-```
 
 
-4) For some reason, the `offered_qos_profiles` information is sometimes duplicated in the *jazzy* file:
-
-- **jazzy:**
-```yaml jazzy
-    - topic_metadata:
-        name: /center
-        type: sensor_msgs/msg/PointCloud
-        serialization_format: cdr
-        offered_qos_profiles:
-          - history: unknown
-            ...
-            avoid_ros_namespace_conventions: false
-          - history: unknown
-            ...
-            avoid_ros_namespace_conventions: false
-        type_description_hash: RIHS01_614593df71d3c2b9bd4604a71b750fd218f0d65c045ea988b713719455a65b3b
-      message_count: 15
-```
 
 ## Purpose of the program
 
