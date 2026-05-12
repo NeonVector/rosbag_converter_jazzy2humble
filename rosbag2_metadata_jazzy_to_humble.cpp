@@ -101,7 +101,7 @@ int main() {
       // Write the converted compact humble-style line
       yaml_file_out << new_target_line << "\n";
 
-      // --- Skip duplicate expanded QoS block and 'type_description_hash:' ---
+      // Skip a possible duplicate expanded QoS block and remove 'type_description_hash:'
       std::string peek_line;
       if (std::getline(yaml_file_in, peek_line)) {
 
@@ -109,8 +109,7 @@ int main() {
                              peek_line.find("\"") == std::string::npos);
 
         if (is_duplicate) {
-          // Dynamically skip all lines belonging to the expanded duplicate QoS block.
-          // Lines in this block are indented (start with spaces) and are not 'type_description_hash:'
+          // Skip the duplicate QoS block until the next metadata field
           while (std::getline(yaml_file_in, peek_line)) {
 
             // Stop and discard 'type_description_hash:' line
@@ -118,34 +117,22 @@ int main() {
               break;
             }
 
-            // If we've exited QoS indentation (non-empty, non-space first char),
-            // this line belongs to the next section — write it and stop skipping
-            if (!peek_line.empty() && peek_line[0] != ' ') {
+            // Safety stops: keep the next meaningful metadata line if the hash is absent
+            if (peek_line.find("message_count:") != std::string::npos ||
+                peek_line.find("- topic_metadata:") != std::string::npos ||
+                (!peek_line.empty() && peek_line[0] != ' ')) {
               yaml_file_out << peek_line << "\n";
               break;
             }
-
-            // If we've reached a new top-level topic entry at 8-space indent with '- topic_metadata:',
-            // this belongs to the next topic — write it and stop skipping
-            if (peek_line.size() > 9 &&
-                peek_line.substr(0, 8) == "        " &&
-                peek_line.find("- topic_metadata:") != std::string::npos) {
-              yaml_file_out << peek_line << "\n";
-              break;
-            }
-
-            // Otherwise: still inside the duplicate QoS block — skip the line
           }
 
         } else {
-          // No duplicate block — just check if it's 'type_description_hash:' and skip it,
-          // otherwise write normally
+          // No duplicate block: only remove 'type_description_hash:'
           if (peek_line.find("type_description_hash:") == std::string::npos) {
             yaml_file_out << peek_line << "\n";
           }
         }
       }
-      // --- End duplicate skip ---
 
     } else {
 

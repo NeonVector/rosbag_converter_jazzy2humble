@@ -53,8 +53,34 @@ By the method of research and comparison, it was determined that the reason for 
   ros_distro: jazzy
 ```
 
+3) The `type_description_hash:` line exists in *Jazzy* metadata, but is absent in *Humble* metadata.
 
+- **jazzy:**
+```yaml jazzy
+    - topic_metadata:
+        ...
+        type_description_hash: RIHS01_e369d0f05a23ae52508854b66f6aa0437f3449d652e8cbf22d5abe85d020f087
+      message_count: 12408
+```
 
+4) In some *Jazzy* metadata files, the expanded `offered_qos_profiles` block may be repeated for the same topic. The converter keeps one converted *Humble*-style QoS profile and skips the repeated expanded block.
+
+- **jazzy:**
+```yaml jazzy
+    - topic_metadata:
+        name: /center
+        type: sensor_msgs/msg/PointCloud
+        serialization_format: cdr
+        offered_qos_profiles:
+          - history: unknown
+            ...
+            avoid_ros_namespace_conventions: false
+          - history: unknown
+            ...
+            avoid_ros_namespace_conventions: false
+        type_description_hash: RIHS01_614593df71d3c2b9bd4604a71b750fd218f0d65c045ea988b713719455a65b3b
+      message_count: 15
+```
 
 ## Purpose of the program
 
@@ -90,7 +116,7 @@ Inside the code, you can specify the name of the output yaml file, by default it
 
 ## Program quality
 
-The program was successfully tested on several rosbacks, and everything was displayed properly in rviz. *humble* run .db3 and .mcap rosbags of *jazzy*.
+The program was successfully tested on 15 rosbags, and everything was displayed properly in rviz. *humble* run .db3 and .mcap rosbags of *jazzy*.
 
 > However, rosbags converted by this program are not read by *jazzy* :)
 
